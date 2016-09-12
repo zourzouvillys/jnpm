@@ -1,0 +1,54 @@
+buildscript {
+    repositories {
+        jcenter()
+        mavenCentral()
+    }
+    dependencies {
+        classpath "com.prezi.pride:gradle-pride-plugin:0.11"
+        classpath 'com.bmuschko:gradle-docker-plugin:3.0.2'
+    }
+}
+
+apply plugin: "pride"
+apply plugin: 'java'
+apply plugin: 'application'
+apply plugin: 'com.bmuschko.docker-remote-api'
+
+version = '0.1-SNAPSHOT'
+sourceCompatibility = 1.8
+group = 'io.zrz.jnpm'
+mainClassName = 'jfe.cli.Main'
+
+repositories {
+    jcenter()
+}
+
+// In this section you declare the dependencies for your production and test code
+dependencies {
+
+	// general utils
+    compile 'org.projectlombok:lombok:1.16.10'
+    compile 'org.slf4j:slf4j-api:1.7.21'
+	compile 'com.google.guava:guava:19.0'
+	compile 'org.apache.commons:commons-lang3:3.4'
+
+	// network + dispatch
+	compile 'com.squareup.okhttp3:okhttp:3.4.1'
+
+	// JSON
+	compile 'com.fasterxml.jackson.core:jackson-databind:2.8.1'
+	compile 'com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.8.1'
+	compile 'com.fasterxml.jackson.datatype:jackson-datatype-guava:2.7.3'
+
+	// command line
+	compile 'com.github.rvesse:airline:2.1.1'
+	compile 'com.github.rvesse:airline-help-bash:2.1.1'
+
+	//
+	compile 'org.apache.commons:commons-compress:1.12'
+	
+	// for testing
+    testCompile 'junit:junit:4.12'
+
+	
+}
