@@ -16,23 +16,23 @@ import lombok.EqualsAndHashCode;
  */
 
 @EqualsAndHashCode
-public class NpmVersionCollection implements NpmVersionRange {
+public class VersionCollection implements VersionRange {
 
-  private final List<NpmVersionRange> items;
-  private final NpmBinaryOperator op;
+  private final List<VersionRange> items;
+  private final BinaryOperator op;
 
-  public NpmVersionCollection(NpmBinaryOperator op, List<NpmVersionRange> items) {
+  public VersionCollection(BinaryOperator op, List<VersionRange> items) {
     this.op = Objects.requireNonNull(op);
     this.items = Objects.requireNonNull(items);
   }
 
   @Override
-  public boolean satisfiedBy(NpmExactVersion version) {
+  public boolean satisfiedBy(ExactVersion version) {
 
     switch (op) {
 
       case And:
-        for (NpmVersionRange spec : this.items) {
+        for (VersionRange spec : this.items) {
           if (!spec.satisfiedBy(version)) {
             return false;
           }
@@ -40,7 +40,7 @@ public class NpmVersionCollection implements NpmVersionRange {
         return true;
 
       case Or:
-        for (NpmVersionRange spec : this.items) {
+        for (VersionRange spec : this.items) {
           if (spec.satisfiedBy(version)) {
             return true;
           }
@@ -55,13 +55,13 @@ public class NpmVersionCollection implements NpmVersionRange {
   }
 
   @Override
-  public <R> R apply(NpmVersionRangeVisitor<R> visitor) {
+  public <R> R apply(SemanticVersionVisitor<R> visitor) {
     return visitor.visitCollection(this);
   }
 
   @Override
   public String toString() {
-    return Joiner.on((op == NpmBinaryOperator.And) ? " " : " || ").join(items);
+    return Joiner.on((op == BinaryOperator.And) ? " " : " || ").join(items);
   }
 
 }

@@ -1,8 +1,9 @@
-package io.zrz.jnpm;
+package io.zrz.jnpm.semver;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -12,18 +13,9 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.base.Preconditions;
 
-import io.zrz.jnpm.semver.NpmBinaryOperator;
-import io.zrz.jnpm.semver.NpmCaretVersion;
-import io.zrz.jnpm.semver.NpmExactVersion;
-import io.zrz.jnpm.semver.NpmUnaryVersion;
-import io.zrz.jnpm.semver.NpmVersionCollection;
-import io.zrz.jnpm.semver.NpmVersionQualifier;
-import io.zrz.jnpm.semver.NpmVersionRange;
-import io.zrz.jnpm.semver.NpmWildcardRange;
+import io.zrz.jnpm.NpmPackageUrlIdentifier;
 
-public class NpmVersionParser {
-
-  private static final NpmVersionParser INSTANCE = new NpmVersionParser();
+public class VersionParser {
 
   private static final Pattern strict = Pattern
       .compile(
@@ -32,11 +24,6 @@ public class NpmVersionParser {
   private static final Pattern p = Pattern
       .compile(
           "^v?([0-9xX\\*]+)(?:\\.([0-9xX\\*]+)(?:\\.([0-9xX\\*]+))?)?(?:\\-?([-0-9A-Za-z\\.]+))?(?:\\+([-0-9A-Za-z\\.]+))?$");
-
-  //
-  public static NpmVersionParser getDefaultInstance() {
-    return INSTANCE;
-  }
 
   private static final Pattern WILDCARD_PATTERN = Pattern
       .compile(
@@ -48,25 +35,26 @@ public class NpmVersionParser {
    * Parses a version with a wildcard in it.
    */
 
-  public NpmWildcardRange tryParseWildcard(String value) {
+  public static Optional<WildcardRange> parseWildcard(String value) {
 
     final Matcher r = WILDCARD_PATTERN.matcher(value);
 
     if (!r.matches()) {
-      return null;
+      return Optional.empty();
     }
 
-    int major = parseWildcardInt(r.group(1));
-    int minor = parseWildcardInt(r.group(2));
-    int patch = parseWildcardInt(r.group(3));
+    final int major = parseWildcardInt(r.group(1));
+    final int minor = parseWildcardInt(r.group(2));
+    final int patch = parseWildcardInt(r.group(3));
 
-    return new NpmWildcardRange(major, minor, patch);
+    return Optional.of(new WildcardRange(major, minor, patch));
 
   }
 
-  private int parseWildcardInt(String group) {
-    if (group == null)
+  private static int parseWildcardInt(String group) {
+    if (group == null) {
       return -1;
+    }
     switch (group) {
       case "X":
       case "x":
@@ -79,28 +67,29 @@ public class NpmVersionParser {
   /**
    * Parses an exact version number. wildcards are not allowed, and a major,
    * minor, and patch MUST all be specified.
-   * 
+   *
    * @param value
    * @return
    */
 
-  public NpmExactVersion parsePartial(String value) {
+  public static ExactVersion parseExact(String value) {
 
-    Matcher r = p.matcher(value);
+    final Matcher r = p.matcher(value);
 
     Preconditions.checkArgument(r.matches(), value);
 
-    return new NpmExactVersion(
-        parseInt(r.group(1)),
-        parseInt(r.group(2)),
-        parseInt(r.group(3)),
-        NpmVersionQualifier.builder().pre(r.group(4)).buildTag(r.group(5)).build());
+    return new ExactVersion(
+        VersionParser.parseInt(r.group(1)),
+        VersionParser.parseInt(r.group(2)),
+        VersionParser.parseInt(r.group(3)),
+        VersionQualifier.builder().pre(r.group(4)).buildTag(r.group(5)).build());
 
   }
 
-  private Integer parseInt(String group) {
-    if (group == null)
+  private static Integer parseInt(String group) {
+    if (group == null) {
       return -1;
+    }
     switch (group) {
       case "X":
       case "x":
@@ -112,12 +101,12 @@ public class NpmVersionParser {
 
   /**
    * Parse a range expression.
-   * 
+   *
    * @param value
    * @return
    */
 
-  public static NpmVersionRange parse(String value) {
+  public static VersionRange parseRange(String value) {
 
     try {
 
@@ -125,13 +114,13 @@ public class NpmVersionParser {
         return new NpmPackageUrlIdentifier(value);
       }
 
-      Scanner s = new Scanner(value);
+      final Scanner s = new Scanner(value);
 
       // Separator only after end of part.
       s.useDelimiter("(?<=([a-zA-Z0-9\\*])) ");
 
-      List<List<String>> values = new LinkedList<>();
-      List<String> collection = new LinkedList<>();
+      final List<List<String>> values = new LinkedList<>();
+      final List<String> collection = new LinkedList<>();
 
       try {
 
@@ -161,29 +150,29 @@ public class NpmVersionParser {
         return parseGroup(values.get(0));
       }
 
-      return new NpmVersionCollection(NpmBinaryOperator.Or,
-          values.stream().map(NpmVersionParser::parseGroup).collect(Collectors.toList()));
+      return new VersionCollection(BinaryOperator.Or,
+          values.stream().map(VersionParser::parseGroup).collect(Collectors.toList()));
 
-    } catch (Exception ex) {
+    } catch (final Exception ex) {
       throw new RuntimeException(value, ex);
     }
 
   }
 
-  static NpmVersionRange parseGroup(List<String> values) {
+  static VersionRange parseGroup(List<String> values) {
 
     if (values.size() == 1) {
       // optimial (and normal) case.
       return parseRangeOrExact(values.get(0));
     }
 
-    return new NpmVersionCollection(
-        NpmBinaryOperator.And,
+    return new VersionCollection(
+        BinaryOperator.And,
         values.stream().map(val -> parseRangeOrExact(val)).collect(Collectors.toList()));
 
   }
 
-  public static NpmVersionRange parseRangeOrExact(String value) {
+  public static VersionRange parseRangeOrExact(String value) {
 
     value = StringUtils.trimToNull(value);
 
@@ -193,28 +182,28 @@ public class NpmVersionParser {
     }
 
     if (value.startsWith(">=")) {
-      return new NpmUnaryVersion(NpmVersionOperator.GreaterOrEqual, parseVersion(value.substring(2)));
+      return new UnaryVersion(VersionOperator.GreaterOrEqual, parseVersion(value.substring(2)));
     } else if (value.startsWith(">")) {
-      return new NpmUnaryVersion(NpmVersionOperator.Greater, parseVersion(value.substring(1)));
+      return new UnaryVersion(VersionOperator.Greater, parseVersion(value.substring(1)));
     } else if (value.startsWith("<=")) {
-      return new NpmUnaryVersion(NpmVersionOperator.LessOrEqual, parseVersion(value.substring(2)));
+      return new UnaryVersion(VersionOperator.LessOrEqual, parseVersion(value.substring(2)));
     } else if (value.startsWith("<")) {
-      return new NpmUnaryVersion(NpmVersionOperator.Less, parseVersion(value.substring(1)));
+      return new UnaryVersion(VersionOperator.Less, parseVersion(value.substring(1)));
     } else if (value.startsWith("~")) {
-      return new NpmUnaryVersion(NpmVersionOperator.TildeRange, parseVersion(value.substring(1)));
+      return new UnaryVersion(VersionOperator.TildeRange, parseVersion(value.substring(1)));
     } else if (value.startsWith("^")) {
-      return new NpmCaretVersion(value.substring(1));
+      return new CaretVersion(value.substring(1));
     } else if (value.startsWith("=")) {
       return parseVersion(value.substring(1));
     }
 
     // handle a wildcard version.
 
-    NpmWildcardRange version = NpmVersionParser.getDefaultInstance().tryParseWildcard(value);
+    final Optional<WildcardRange> version = VersionParser.parseWildcard(value);
 
-    if (version != null) {
+    if (version.isPresent()) {
       // something like '1.2.x'
-      return version;
+      return version.get();
     }
 
     // version1 - version2 Same as >=version1 <=version2.
@@ -225,19 +214,19 @@ public class NpmVersionParser {
     // tag A specific version tagged and published as tag See npm-tag
     // path/path/path See Local Paths below
 
-    return new NpmTagIdentifier(value);
+    return new TagIdentifier(value);
 
   }
 
   /**
    * Parses an exact semver, e.g "5.6.4-beta.1+edfrwf".
-   * 
+   *
    * @param value
    * @return
    */
 
-  public static NpmExactVersion parseVersion(String value) {
-    return NpmVersionParser.getDefaultInstance().parsePartial(value.trim());
+  public static ExactVersion parseVersion(String value) {
+    return VersionParser.parseExact(value.trim());
   }
 
 }

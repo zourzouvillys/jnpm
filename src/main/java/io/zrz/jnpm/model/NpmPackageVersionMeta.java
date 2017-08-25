@@ -9,8 +9,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-import io.zrz.jnpm.semver.NpmExactVersion;
-import io.zrz.jnpm.semver.NpmVersionRange;
+import io.zrz.jnpm.semver.ExactVersion;
+import io.zrz.jnpm.semver.VersionRange;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
@@ -56,14 +56,14 @@ public class NpmPackageVersionMeta {
   public JsonNode files;
   public JsonNode browserify;
 
-  @JsonDeserialize(contentAs = NpmVersionRange.class)
-  public Map<String, NpmVersionRange> dependencies = new HashMap<>();
-  @JsonDeserialize(contentAs = NpmVersionRange.class)
-  public Map<String, NpmVersionRange> devDependencies = new HashMap<>();
-  @JsonDeserialize(contentAs = NpmVersionRange.class)
-  public Map<String, NpmVersionRange> peerDependencies = new HashMap<>();
-  @JsonDeserialize(contentAs = NpmVersionRange.class)
-  public Map<String, NpmVersionRange> optionalDependencies = new HashMap<>();
+  @JsonDeserialize(contentAs = VersionRange.class)
+  public Map<String, VersionRange> dependencies = new HashMap<>();
+  @JsonDeserialize(contentAs = VersionRange.class)
+  public Map<String, VersionRange> devDependencies = new HashMap<>();
+  @JsonDeserialize(contentAs = VersionRange.class)
+  public Map<String, VersionRange> peerDependencies = new HashMap<>();
+  @JsonDeserialize(contentAs = VersionRange.class)
+  public Map<String, VersionRange> optionalDependencies = new HashMap<>();
 
   public JsonNode maintainers;
 
@@ -90,8 +90,8 @@ public class NpmPackageVersionMeta {
     return String.format("{%s@%s}", name, version);
   }
 
-  public NpmExactVersion version() {
-    return NpmExactVersion.fromString(version);
+  public ExactVersion version() {
+    return ExactVersion.fromString(version);
   }
 
 }

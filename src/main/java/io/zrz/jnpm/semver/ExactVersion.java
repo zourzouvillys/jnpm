@@ -7,77 +7,76 @@ import org.apache.commons.lang3.StringUtils;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.base.CharMatcher;
 
-import io.zrz.jnpm.NpmVersion;
-import io.zrz.jnpm.NpmVersionParser;
 import lombok.EqualsAndHashCode;
 
 /**
- * A representation of a concrete semantic version number.
- * 
+ * A concrete semantic version number.
+ *
  * @author theo
  *
  */
 
 @EqualsAndHashCode
-public class NpmExactVersion implements NpmVersionRange, Comparable<NpmExactVersion>, NpmVersion {
+public class ExactVersion implements VersionRange, Comparable<ExactVersion>, SemanticVersion {
 
   private final int major, minor, patch;
-  private NpmVersionQualifier qualifier;
+  private final VersionQualifier qualifier;
 
-  public NpmExactVersion(int major, int minor, int patch) {
-    this(major, minor, patch, NpmVersionQualifier.emptyQualifier());
+  public ExactVersion(int major, int minor, int patch) {
+    this(major, minor, patch, VersionQualifier.emptyQualifier());
   }
 
-  public NpmExactVersion(int major, int minor, int patch, NpmVersionQualifier qualifier) {
+  public ExactVersion(int major, int minor, int patch, VersionQualifier qualifier) {
     this.major = major;
     this.minor = minor;
     this.patch = patch;
     this.qualifier = Objects.requireNonNull(qualifier);
   }
 
-  public NpmVersionQualifier qualifier() {
+  public VersionQualifier qualifier() {
     return this.qualifier;
   }
 
-  public NpmExactVersion withoutPrerelease() {
-    return new NpmExactVersion(major, minor, patch, qualifier.withoutPrerelease());
+  public ExactVersion withoutPrerelease() {
+    return new ExactVersion(this.major, this.minor, this.patch, this.qualifier.withoutPrerelease());
   }
 
-  public NpmExactVersion withIncrement(NpmVersionPart part) {
+  public ExactVersion withIncrement(VersionPart part) {
     switch (part) {
       case Major:
-        return new NpmExactVersion(major + 1, 0, 0);
+        return new ExactVersion(this.major + 1, 0, 0);
       case Minor:
-        return new NpmExactVersion(major, minor + 1, 0);
+        return new ExactVersion(this.major, this.minor + 1, 0);
       case Patch:
-        return new NpmExactVersion(major, minor, patch + 1);
+        return new ExactVersion(this.major, this.minor, this.patch + 1);
     }
     throw new IllegalArgumentException(part.toString());
   }
 
   /**
-   * 
+   *
    * @param part
    * @param pre
    * @return
    */
 
-  public NpmExactVersion withPrerelease(NpmVersionPart part, String pre) {
+  public ExactVersion withPrerelease(VersionPart part, String pre) {
     switch (part) {
       case Major:
-        return new NpmExactVersion(major + 1, 0, 0, pre(pre, 0));
+        return new ExactVersion(this.major + 1, 0, 0, this.pre(pre, 0));
       case Minor:
-        return new NpmExactVersion(major, minor + 1, 0, pre(pre, 0));
+        return new ExactVersion(this.major, this.minor + 1, 0, this.pre(pre, 0));
       case Patch:
-        return new NpmExactVersion(major, minor, patch + 1, pre(pre, 0));
+        return new ExactVersion(this.major, this.minor, this.patch + 1, this.pre(pre, 0));
     }
     throw new IllegalArgumentException(part.toString());
   }
 
-  private NpmVersionQualifier pre(String pre, int ver) {
-    if (pre == null)
-      return qualifier.withPre(Integer.toString(ver));
-    return qualifier.withPre(String.format("%s.%d", pre, ver));
+  private VersionQualifier pre(String pre, int ver) {
+    if (pre == null) {
+      return this.qualifier.withPre(Integer.toString(ver));
+    }
+    return this.qualifier.withPre(String.format("%s.%d", pre, ver));
   }
 
   /**
@@ -86,7 +85,7 @@ public class NpmExactVersion implements NpmVersionRange, Comparable<NpmExactVers
 
   private String pre(String tag) {
 
-    String pfx = String.format("%s.", tag);
+    final String pfx = String.format("%s.", tag);
 
     // is there an existing tag?
 
@@ -97,7 +96,7 @@ public class NpmExactVersion implements NpmVersionRange, Comparable<NpmExactVers
       return String.format("%s.%d", tag, 0);
     }
 
-    String current = this.qualifier.getPre().substring(pfx.length());
+    final String current = this.qualifier.getPre().substring(pfx.length());
 
     if (!current.isEmpty() && CharMatcher.inRange('0', '9').matchesAllOf(current)) {
       return pfx + (Integer.parseInt(current) + 1);
@@ -109,25 +108,25 @@ public class NpmExactVersion implements NpmVersionRange, Comparable<NpmExactVers
 
   }
 
-  public NpmExactVersion withPrerelease(String pre) {
+  public ExactVersion withPrerelease(String pre) {
     if (this.qualifier.getPre() != null) {
-      return new NpmExactVersion(major, minor, patch, this.qualifier.withPre(pre(pre)));
+      return new ExactVersion(this.major, this.minor, this.patch, this.qualifier.withPre(this.pre(pre)));
     }
-    return withPrerelease(NpmVersionPart.Patch, pre);
+    return this.withPrerelease(VersionPart.Patch, pre);
   }
 
-  public NpmExactVersion withPrerelease() {
-    return withPrerelease(null);
+  public ExactVersion withPrerelease() {
+    return this.withPrerelease(null);
   }
 
-  public NpmExactVersion withBuild(String build) {
+  public ExactVersion withBuild(String build) {
     return this;
   }
 
   //
 
   @Override
-  public <R> R apply(NpmVersionRangeVisitor<R> visitor) {
+  public <R> R apply(SemanticVersionVisitor<R> visitor) {
     return visitor.visitExactVersion(this);
   }
 
@@ -135,13 +134,13 @@ public class NpmExactVersion implements NpmVersionRange, Comparable<NpmExactVers
   @JsonValue
   public String toString() {
 
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
 
-    sb.append(major == -1 ? "X" : major);
+    sb.append(this.major == -1 ? "X" : this.major);
     sb.append(".");
-    sb.append(minor == -1 ? "X" : minor);
+    sb.append(this.minor == -1 ? "X" : this.minor);
     sb.append(".");
-    sb.append(patch == -1 ? "X" : patch);
+    sb.append(this.patch == -1 ? "X" : this.patch);
 
     sb.append(this.qualifier.toString());
 
@@ -150,38 +149,38 @@ public class NpmExactVersion implements NpmVersionRange, Comparable<NpmExactVers
   }
 
   public int major() {
-    return major;
+    return this.major;
   }
 
   public int minor() {
-    return minor;
+    return this.minor;
   }
 
   public int patch() {
-    return patch;
+    return this.patch;
   }
 
   /**
    * returns the right most element which has a positive value.
-   * 
+   *
    * fields which have a wildcard value do not count.
-   * 
+   *
    * @param defaultValue
    * @return
    */
 
-  public NpmVersionPart leftMostNonZeroPosition() {
+  public VersionPart leftMostNonZeroPosition() {
 
     if (this.major() > 0) {
-      return NpmVersionPart.Major;
+      return VersionPart.Major;
     }
 
     if (this.minor() > 0) {
-      return NpmVersionPart.Minor;
+      return VersionPart.Minor;
     }
 
     if (this.patch() > 0) {
-      return NpmVersionPart.Patch;
+      return VersionPart.Patch;
     }
 
     return null;
@@ -190,25 +189,25 @@ public class NpmExactVersion implements NpmVersionRange, Comparable<NpmExactVers
 
   /**
    * returns the right most element which has a positive value.
-   * 
+   *
    * fields which have a wildcard value do not count.
-   * 
+   *
    * @param defaultValue
    * @return
    */
 
-  public NpmVersionPart rightMostNonZeroPosition(NpmVersionPart defaultValue) {
+  public VersionPart rightMostNonZeroPosition(VersionPart defaultValue) {
 
     if (this.patch() > 0) {
-      return NpmVersionPart.Patch;
+      return VersionPart.Patch;
     }
 
     if (this.minor() > 0) {
-      return NpmVersionPart.Minor;
+      return VersionPart.Minor;
     }
 
     if (this.major() > 0) {
-      return NpmVersionPart.Major;
+      return VersionPart.Major;
     }
 
     return defaultValue;
@@ -216,36 +215,42 @@ public class NpmExactVersion implements NpmVersionRange, Comparable<NpmExactVers
   }
 
   @Override
-  public boolean satisfiedBy(NpmExactVersion version) {
+  public boolean satisfiedBy(ExactVersion version) {
     return this.equals(version);
   }
 
-  public static NpmExactVersion fromString(String string) {
-    return NpmVersionParser.getDefaultInstance().parsePartial(string);
+  public static ExactVersion fromString(String string) {
+    return VersionParser.parseExact(string);
   }
 
-  public int compareTo(NpmExactVersion other) {
+  @Override
+  public int compareTo(ExactVersion other) {
 
     if (this.major != -1 && other.major != -1) {
-      if (this.major != other.major)
+      if (this.major != other.major) {
         return Integer.compare(this.major, other.major);
+      }
     }
 
     if (this.minor != -1 && other.minor != -1) {
-      if (this.minor != other.minor)
+      if (this.minor != other.minor) {
         return Integer.compare(this.minor, other.minor);
+      }
     }
 
     if (this.patch != -1 && other.patch != -1) {
-      if (this.patch != other.patch)
+      if (this.patch != other.patch) {
         return Integer.compare(this.patch, other.patch);
+      }
     }
 
     if (!StringUtils.equals(this.qualifier.getPre(), other.qualifier.getPre())) {
-      if (this.qualifier.getPre() != null && other.qualifier.getPre() == null)
+      if (this.qualifier.getPre() != null && other.qualifier.getPre() == null) {
         return -1;
-      if (this.qualifier.getPre() == null && other.qualifier.getPre() != null)
+      }
+      if (this.qualifier.getPre() == null && other.qualifier.getPre() != null) {
         return 1;
+      }
       return this.qualifier.getPre().compareTo(other.qualifier.getPre());
     }
 

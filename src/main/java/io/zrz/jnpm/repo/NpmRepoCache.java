@@ -29,8 +29,8 @@ import io.zrz.jnpm.NpmObjectMapper;
 import io.zrz.jnpm.NpmPackageRepository;
 import io.zrz.jnpm.model.NpmPackageMeta;
 import io.zrz.jnpm.model.NpmPackageVersionMeta;
-import io.zrz.jnpm.semver.NpmExactVersion;
-import io.zrz.jnpm.semver.NpmVersionRange;
+import io.zrz.jnpm.semver.ExactVersion;
+import io.zrz.jnpm.semver.VersionRange;
 import lombok.SneakyThrows;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -200,7 +200,7 @@ public class NpmRepoCache implements NpmPackageRepository {
 
   @Override
   @SneakyThrows(IOException.class)
-  public NpmExactVersion distTag(String name, String tag) {
+  public ExactVersion distTag(String name, String tag) {
 
     JsonParser jp = NpmObjectMapper.createParser(fetch(name));
 
@@ -230,7 +230,7 @@ public class NpmRepoCache implements NpmPackageRepository {
             // this moves the parsing position to the end of it
 
             if (ttag.equals(tag)) {
-              return NpmExactVersion.fromString(jp.getText());
+              return ExactVersion.fromString(jp.getText());
             }
 
             jp.skipChildren();
@@ -253,7 +253,7 @@ public class NpmRepoCache implements NpmPackageRepository {
 
   @Override
   @SneakyThrows(IOException.class)
-  public List<NpmExactVersion> query(String name, NpmVersionRange versionSpec) {
+  public List<ExactVersion> query(String name, VersionRange versionSpec) {
 
     Objects.requireNonNull(versionSpec);
 
@@ -263,7 +263,7 @@ public class NpmRepoCache implements NpmPackageRepository {
 
     Preconditions.checkArgument(current == JsonToken.START_OBJECT, current);
 
-    List<NpmExactVersion> results = new ArrayList<>();
+    List<ExactVersion> results = new ArrayList<>();
 
     //
     while (jp.nextToken() != JsonToken.END_OBJECT) {
@@ -278,7 +278,7 @@ public class NpmRepoCache implements NpmPackageRepository {
 
           while (jp.nextToken() != JsonToken.END_OBJECT) {
 
-            NpmExactVersion version = NpmExactVersion.fromString(jp.getCurrentName());
+            ExactVersion version = ExactVersion.fromString(jp.getCurrentName());
 
             // move from field name to field value
             current = jp.nextToken();
@@ -310,7 +310,7 @@ public class NpmRepoCache implements NpmPackageRepository {
 
   @SneakyThrows(IOException.class)
   @Override
-  public NpmPackageVersionMeta query(String name, NpmExactVersion version) {
+  public NpmPackageVersionMeta query(String name, ExactVersion version) {
 
     JsonParser jp = NpmObjectMapper.createParser(fetch(name));
 
@@ -332,7 +332,7 @@ public class NpmRepoCache implements NpmPackageRepository {
           while (jp.nextToken() != JsonToken.END_OBJECT) {
 
             // move from field name to field value
-            if (NpmExactVersion.fromString(jp.getCurrentName()).equals(version)) {
+            if (ExactVersion.fromString(jp.getCurrentName()).equals(version)) {
               current = jp.nextToken();
               return jp.readValueAs(NpmPackageVersionMeta.class);
             }
@@ -358,7 +358,7 @@ public class NpmRepoCache implements NpmPackageRepository {
 
   @SneakyThrows(IOException.class)
   @Override
-  public Path dist(String packageName, NpmExactVersion packageVersion) {
+  public Path dist(String packageName, ExactVersion packageVersion) {
 
     NpmPackageVersionMeta info = query(packageName, packageVersion);
 

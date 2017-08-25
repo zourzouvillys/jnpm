@@ -1,10 +1,10 @@
 package io.zrz.jnpm;
 
-import io.zrz.jnpm.semver.NpmExactVersion;
-import io.zrz.jnpm.semver.NpmVersionRange;
-import io.zrz.jnpm.semver.NpmVersionRangeVisitor;
+import io.zrz.jnpm.semver.ExactVersion;
+import io.zrz.jnpm.semver.VersionRange;
+import io.zrz.jnpm.semver.SemanticVersionVisitor;
 
-public class NpmPackageUrlIdentifier implements NpmVersionRange {
+public class NpmPackageUrlIdentifier implements VersionRange {
 
   private String value;
 
@@ -13,12 +13,12 @@ public class NpmPackageUrlIdentifier implements NpmVersionRange {
   }
 
   @Override
-  public boolean satisfiedBy(NpmExactVersion version) {
+  public boolean satisfiedBy(ExactVersion version) {
     throw new IllegalArgumentException(value);
   }
 
   @Override
-  public <R> R apply(NpmVersionRangeVisitor<R> visitor) {
+  public <R> R apply(SemanticVersionVisitor<R> visitor) {
     return visitor.visitNpmPackageUrlIdentifier(this);
   }
 

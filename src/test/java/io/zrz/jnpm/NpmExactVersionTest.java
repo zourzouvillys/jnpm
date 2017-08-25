@@ -10,30 +10,30 @@ import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
-import io.zrz.jnpm.semver.NpmExactVersion;
-import io.zrz.jnpm.semver.NpmVersionPart;
+import io.zrz.jnpm.semver.ExactVersion;
+import io.zrz.jnpm.semver.VersionPart;
 
 public class NpmExactVersionTest {
 
   @Test
   public void test() {
 
-    assertEquals("13.0.0", NpmExactVersion.fromString("12.4.4").withIncrement(NpmVersionPart.Major).toString());
-    assertEquals("12.5.0", NpmExactVersion.fromString("12.4.4").withIncrement(NpmVersionPart.Minor).toString());
-    assertEquals("12.4.5", NpmExactVersion.fromString("12.4.4").withIncrement(NpmVersionPart.Patch).toString());
+    assertEquals("13.0.0", ExactVersion.fromString("12.4.4").withIncrement(VersionPart.Major).toString());
+    assertEquals("12.5.0", ExactVersion.fromString("12.4.4").withIncrement(VersionPart.Minor).toString());
+    assertEquals("12.4.5", ExactVersion.fromString("12.4.4").withIncrement(VersionPart.Patch).toString());
 
   }
 
   @Test
   public void testRelease() {
-    assertEquals("12.4.5-0", NpmExactVersion.fromString("12.4.4").withPrerelease().toString());
-    assertEquals("12.4.5-beta.0", NpmExactVersion.fromString("12.4.4").withPrerelease("beta").toString());
-    assertEquals("12.4.5-beta.1", NpmExactVersion.fromString("12.4.5-beta.0").withPrerelease("beta").toString());
-    assertEquals("12.4.5-beta.0", NpmExactVersion.fromString("12.4.5-beta0").withPrerelease("beta").toString());
-    assertEquals("12.4.5-rc.0", NpmExactVersion.fromString("12.4.5-beta.0").withPrerelease("rc").toString());
-    assertEquals("12.4.5-rc.0", NpmExactVersion.fromString("12.4.5-beta.1").withPrerelease("rc").toString());
+    assertEquals("12.4.5-0", ExactVersion.fromString("12.4.4").withPrerelease().toString());
+    assertEquals("12.4.5-beta.0", ExactVersion.fromString("12.4.4").withPrerelease("beta").toString());
+    assertEquals("12.4.5-beta.1", ExactVersion.fromString("12.4.5-beta.0").withPrerelease("beta").toString());
+    assertEquals("12.4.5-beta.0", ExactVersion.fromString("12.4.5-beta0").withPrerelease("beta").toString());
+    assertEquals("12.4.5-rc.0", ExactVersion.fromString("12.4.5-beta.0").withPrerelease("rc").toString());
+    assertEquals("12.4.5-rc.0", ExactVersion.fromString("12.4.5-beta.1").withPrerelease("rc").toString());
     assertEquals("13.0.0-rc.0",
-        NpmExactVersion.fromString("12.4.5-rc.1").withPrerelease(NpmVersionPart.Major, "rc").toString());
+        ExactVersion.fromString("12.4.5-rc.1").withPrerelease(VersionPart.Major, "rc").toString());
   }
 
   @Test
@@ -68,19 +68,19 @@ public class NpmExactVersionTest {
     assertTrue(compareTo("1", "0.9") > 0);
 
     
-    ArrayList<NpmExactVersion> list = Lists.newArrayList(
-        NpmExactVersion.fromString("0.8.0"),
-        NpmExactVersion.fromString("0.8.1"),
-        NpmExactVersion.fromString("0.8.2"),
-        NpmExactVersion.fromString("0.8.3"),
-        NpmExactVersion.fromString("0.8.4"));
+    ArrayList<ExactVersion> list = Lists.newArrayList(
+        ExactVersion.fromString("0.8.0"),
+        ExactVersion.fromString("0.8.1"),
+        ExactVersion.fromString("0.8.2"),
+        ExactVersion.fromString("0.8.3"),
+        ExactVersion.fromString("0.8.4"));
 
     Collections.sort(list);
 
   }
 
   private int compareTo(String str1, String str2) {
-    return NpmExactVersion.fromString(str1).compareTo(NpmExactVersion.fromString(str2));
+    return ExactVersion.fromString(str1).compareTo(ExactVersion.fromString(str2));
   }
 
 }

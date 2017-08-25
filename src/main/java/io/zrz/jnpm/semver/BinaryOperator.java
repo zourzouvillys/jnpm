@@ -1,5 +1,5 @@
 package io.zrz.jnpm.semver;
 
-public enum NpmBinaryOperator {
+public enum BinaryOperator {
   And, Or
 }

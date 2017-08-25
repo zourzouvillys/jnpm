@@ -10,8 +10,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-import io.zrz.jnpm.NpmTagIdentifier;
-import io.zrz.jnpm.semver.NpmExactVersion;
+import io.zrz.jnpm.semver.ExactVersion;
+import io.zrz.jnpm.semver.TagIdentifier;
 
 @JsonIgnoreProperties(value = {
     "_id",
@@ -27,8 +27,8 @@ public class NpmPackageMeta {
   public String readme;
   public String readmeFilename;
 
-  @JsonDeserialize(keyAs = NpmExactVersion.class)
-  public Map<NpmExactVersion, NpmPackageVersionMeta> versions = new HashMap<>();
+  @JsonDeserialize(keyAs = ExactVersion.class)
+  public Map<ExactVersion, NpmPackageVersionMeta> versions = new HashMap<>();
   public Map<String, String> time;
   public Map<String, Boolean> users;
   public List<String> homepage;
@@ -37,8 +37,8 @@ public class NpmPackageMeta {
   public JsonNode bugs;
 
   @JsonProperty("dist-tags")
-  @JsonDeserialize(keyAs = NpmTagIdentifier.class, contentAs = NpmExactVersion.class)
-  public Map<NpmTagIdentifier, NpmExactVersion> distTags = new HashMap<>();
+  @JsonDeserialize(keyAs = TagIdentifier.class, contentAs = ExactVersion.class)
+  public Map<TagIdentifier, ExactVersion> distTags = new HashMap<>();
 
   private Map<String, JsonNode> values = new HashMap<>();
 

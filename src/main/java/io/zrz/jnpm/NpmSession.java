@@ -11,8 +11,8 @@ import com.google.common.base.Strings;
 
 import io.zrz.jnpm.model.NpmPackageMeta;
 import io.zrz.jnpm.model.NpmPackageVersionMeta;
-import io.zrz.jnpm.semver.NpmExactVersion;
-import io.zrz.jnpm.semver.NpmVersionRange;
+import io.zrz.jnpm.semver.ExactVersion;
+import io.zrz.jnpm.semver.VersionRange;
 
 /**
  * a single context for transactional session.
@@ -45,7 +45,7 @@ public class NpmSession {
    * @return
    */
 
-  public List<NpmExactVersion> matching(String name, NpmVersionRange versionSpec) {
+  public List<ExactVersion> matching(String name, VersionRange versionSpec) {
     Preconditions.checkNotNull(versionSpec);
     Preconditions.checkArgument(!Strings.isNullOrEmpty(StringUtils.trimToNull(name)));
     return repo.query(name, versionSpec)
@@ -53,11 +53,11 @@ public class NpmSession {
         .collect(Collectors.toList());
   }
 
-  public NpmPackageVersionMeta meta(String name, NpmExactVersion version) {
+  public NpmPackageVersionMeta meta(String name, ExactVersion version) {
     return repo.query(name, version);
   }
 
-  public Path dist(String packageName, NpmExactVersion packageVersion) {
+  public Path dist(String packageName, ExactVersion packageVersion) {
     return repo.dist(packageName, packageVersion);
   }
 
@@ -68,7 +68,7 @@ public class NpmSession {
    * @return
    */
 
-  public NpmExactVersion distTag(String name, String tag) {
+  public ExactVersion distTag(String name, String tag) {
     return repo.distTag(name, tag);
   }
 

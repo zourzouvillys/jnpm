@@ -5,8 +5,8 @@ import java.util.List;
 
 import io.zrz.jnpm.model.NpmPackageMeta;
 import io.zrz.jnpm.model.NpmPackageVersionMeta;
-import io.zrz.jnpm.semver.NpmExactVersion;
-import io.zrz.jnpm.semver.NpmVersionRange;
+import io.zrz.jnpm.semver.ExactVersion;
+import io.zrz.jnpm.semver.VersionRange;
 
 /**
  * A repository which provides responses to queries about packages.
@@ -19,12 +19,12 @@ public interface NpmPackageRepository {
 
   NpmPackageMeta query(String name);
 
-  NpmExactVersion distTag(String name, String version);
+  ExactVersion distTag(String name, String version);
 
-  NpmPackageVersionMeta query(String name, NpmExactVersion version);
+  NpmPackageVersionMeta query(String name, ExactVersion version);
 
-  List<NpmExactVersion> query(String name, NpmVersionRange versionSpec);
+  List<ExactVersion> query(String name, VersionRange versionSpec);
 
-  Path dist(String packageName, NpmExactVersion packageVersion);
+  Path dist(String packageName, ExactVersion packageVersion);
 
 }

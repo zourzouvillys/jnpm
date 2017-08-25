@@ -2,39 +2,37 @@ package io.zrz.jnpm.semver;
 
 import org.apache.commons.lang3.NotImplementedException;
 
-import io.zrz.jnpm.NpmUtils;
-import io.zrz.jnpm.NpmVersionOperator;
 import lombok.Getter;
 
 /**
  * A unary version operator.
- * 
+ *
  * @author theo
  *
  */
 
-public class NpmUnaryVersion implements NpmVersionRange {
+public class UnaryVersion implements VersionRange {
 
   @Getter
-  private NpmVersionOperator op;
+  private final VersionOperator op;
 
   @Getter
-  private NpmExactVersion version;
+  private final ExactVersion version;
 
-  public NpmUnaryVersion(NpmVersionOperator op, NpmExactVersion version) {
+  public UnaryVersion(VersionOperator op, ExactVersion version) {
     this.op = op;
     this.version = version;
   }
 
   @Override
-  public <R> R apply(NpmVersionRangeVisitor<R> visitor) {
+  public <R> R apply(SemanticVersionVisitor<R> visitor) {
     return visitor.visitUnaryExpressionVersion(this);
   }
 
   @Override
-  public boolean satisfiedBy(NpmExactVersion other) {
+  public boolean satisfiedBy(ExactVersion other) {
 
-    switch (op) {
+    switch (this.op) {
 
       case Greater:
         return other.compareTo(this.version) > 0;
@@ -50,7 +48,7 @@ public class NpmUnaryVersion implements NpmVersionRange {
 
       case TildeRange:
 
-        if (!NpmUtils.allowedMatch(this.version, other)) {
+        if (!VersionUtils.allowedMatch(this.version, other)) {
           return false;
         }
 
@@ -58,15 +56,16 @@ public class NpmUnaryVersion implements NpmVersionRange {
           return false;
         }
 
-        NpmExactVersion test = this.version
-            .withIncrement((this.version.rightMostNonZeroPosition(NpmVersionPart.Major) == NpmVersionPart.Major)
-                ? NpmVersionPart.Major : NpmVersionPart.Minor);
+        final ExactVersion test = this.version
+            .withIncrement((this.version.rightMostNonZeroPosition(VersionPart.Major) == VersionPart.Major)
+                ? VersionPart.Major
+                : VersionPart.Minor);
 
         return other.compareTo(test) < 0;
 
       default:
 
-        throw new NotImplementedException(op.toString());
+        throw new NotImplementedException(this.op.toString());
 
     }
 
@@ -74,7 +73,7 @@ public class NpmUnaryVersion implements NpmVersionRange {
 
   @Override
   public String toString() {
-    return String.format("%s%s", op, version);
+    return String.format("%s%s", this.op, this.version);
   }
 
 }

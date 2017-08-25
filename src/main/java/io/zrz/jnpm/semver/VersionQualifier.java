@@ -7,9 +7,9 @@ import lombok.experimental.Wither;
 @Value
 @Builder
 @Wither
-public class NpmVersionQualifier {
+public class VersionQualifier implements VersionSpec {
 
-  private static final NpmVersionQualifier EMPTY = new NpmVersionQualifier(null, null);
+  private static final VersionQualifier EMPTY = new VersionQualifier(null, null);
 
   /**
    * The prerelease tag.
@@ -23,11 +23,11 @@ public class NpmVersionQualifier {
 
   private final String buildTag;
 
-  public NpmVersionQualifier withoutPrerelease() {
+  public VersionQualifier withoutPrerelease() {
     return this.withPre(null);
   }
 
-  public static NpmVersionQualifier emptyQualifier() {
+  public static VersionQualifier emptyQualifier() {
     return EMPTY;
   }
 
@@ -35,13 +35,13 @@ public class NpmVersionQualifier {
 
   public String toString() {
 
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
 
     if (this.pre != null) {
-      sb.append('-').append(pre);
+      sb.append('-').append(this.pre);
     }
     if (this.buildTag != null) {
-      sb.append('+').append(buildTag);
+      sb.append('+').append(this.buildTag);
     }
 
     return sb.toString();

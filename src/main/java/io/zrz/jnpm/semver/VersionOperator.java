@@ -1,6 +1,6 @@
-package io.zrz.jnpm;
+package io.zrz.jnpm.semver;
 
-public enum NpmVersionOperator {
+public enum VersionOperator {
 
   GreaterOrEqual(">="),
 
@@ -17,7 +17,7 @@ public enum NpmVersionOperator {
 
   private String str;
 
-  private NpmVersionOperator(String str) {
+  private VersionOperator(String str) {
     this.str = str;
   }
 

@@ -13,11 +13,11 @@ import lombok.EqualsAndHashCode;
  */
 
 @EqualsAndHashCode
-public class NpmWildcardRange implements NpmVersionRange {
+public class WildcardRange implements VersionRange {
 
   private final int major, minor, patch;
 
-  public NpmWildcardRange(int major, int minor, int patch) {
+  public WildcardRange(int major, int minor, int patch) {
 
     this.major = major;
     this.minor = minor;
@@ -45,12 +45,12 @@ public class NpmWildcardRange implements NpmVersionRange {
   }
 
   @Override
-  public <R> R apply(NpmVersionRangeVisitor<R> visitor) {
+  public <R> R apply(SemanticVersionVisitor<R> visitor) {
     return visitor.visitWildcardRange(this);
   }
 
   @Override
-  public boolean satisfiedBy(NpmExactVersion version) {
+  public boolean satisfiedBy(ExactVersion version) {
 
     if (this.major == -1) {
       return true;
@@ -74,20 +74,20 @@ public class NpmWildcardRange implements NpmVersionRange {
 
   }
 
-  public static NpmWildcardRange fromParts() {
-    return new NpmWildcardRange(-1, -1, -1);
+  public static WildcardRange fromParts() {
+    return new WildcardRange(-1, -1, -1);
   }
 
-  public static NpmWildcardRange fromParts(int major) {
-    return new NpmWildcardRange(major, -1, -1);
+  public static WildcardRange fromParts(int major) {
+    return new WildcardRange(major, -1, -1);
   }
 
-  public static NpmWildcardRange fromParts(int major, int minor) {
-    return new NpmWildcardRange(major, minor, -1);
+  public static WildcardRange fromParts(int major, int minor) {
+    return new WildcardRange(major, minor, -1);
   }
 
-  public static NpmWildcardRange fromParts(int major, int minor, int patch) {
-    return new NpmWildcardRange(major, minor, patch);
+  public static WildcardRange fromParts(int major, int minor, int patch) {
+    return new WildcardRange(major, minor, patch);
   }
 
 }

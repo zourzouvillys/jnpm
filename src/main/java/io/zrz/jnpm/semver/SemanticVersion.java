@@ -1,4 +1,4 @@
-package io.zrz.jnpm;
+package io.zrz.jnpm.semver;
 
 /**
  * a tag version (which resolves to a concrete version), or a concerete version.
@@ -7,6 +7,6 @@ package io.zrz.jnpm;
  *
  */
 
-public interface NpmVersion {
+public interface SemanticVersion {
 
 }

@@ -1,5 +1,5 @@
 package io.zrz.jnpm.semver;
 
-public enum NpmVersionPart {
+public enum VersionPart {
   Major, Minor, Patch
 }
