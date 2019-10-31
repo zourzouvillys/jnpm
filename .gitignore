@@ -4,3 +4,4 @@
 .settings
 bin
 build
+/.apt_generated/

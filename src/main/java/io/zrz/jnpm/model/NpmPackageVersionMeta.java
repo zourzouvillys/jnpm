@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.immutables.value.Value;
+
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -11,20 +13,18 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import io.zrz.jnpm.semver.ExactVersion;
 import io.zrz.jnpm.semver.VersionRange;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 @JsonIgnoreProperties(value = {
-    "_id",
-    "_npmOperationalInternal",
-    "_from",
-    "_npmVersion",
-    "_shasum",
-    "_nodeVersion",
-    "_defaultsLoaded",
-    "_resolved",
-    "_engineSupported",
-    "_npmUser" })
+  "_id",
+  "_npmOperationalInternal",
+  "_from",
+  "_npmVersion",
+  "_shasum",
+  "_nodeVersion",
+  "_defaultsLoaded",
+  "_resolved",
+  "_engineSupported",
+  "_npmUser" })
 public class NpmPackageVersionMeta {
 
   public JsonNode license;
@@ -37,11 +37,10 @@ public class NpmPackageVersionMeta {
   //
   public List<String> keywords;
 
-  @ToString
-  @EqualsAndHashCode
-  public static class DistInfo {
-    public String shasum;
-    public String tarball;
+  @Value.Immutable
+  public interface DistInfo {
+    String shasum();
+    String tarball();
   }
 
   public JsonNode author;
@@ -86,6 +85,7 @@ public class NpmPackageVersionMeta {
     return String.format("%s@%s", name, version);
   }
 
+  @Override
   public String toString() {
     return String.format("{%s@%s}", name, version);
   }

@@ -10,7 +10,7 @@ public class NpmUtils {
 
   public static NpmPackageVersionMeta latest(NpmPackageMeta pkg) {
     final ExactVersion latest = pkg.distTags.get(TagIdentifier.LATEST);
-    return pkg.versions.get(latest);
+    return pkg.versions().get(latest);
   }
 
   public static NpmPackageVersionMeta highest(NpmPackageMeta meta, VersionRange spec) {

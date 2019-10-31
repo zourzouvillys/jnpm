@@ -4,51 +4,78 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonAnySetter;
+import org.immutables.value.Value;
+import org.immutables.vavr.encodings.VavrEncodingEnabled;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import io.zrz.jnpm.semver.ExactVersion;
 import io.zrz.jnpm.semver.TagIdentifier;
 
 @JsonIgnoreProperties(value = {
-    "_id",
-    "_attachments",
-    "_rev"
+  "_id",
+  "_attachments",
+  "_rev"
 })
-public class NpmPackageMeta {
+@Value.Immutable
+@VavrEncodingEnabled
+@Value.Style(overshadowImplementation = true, deepImmutablesDetection = true)
+@JsonDeserialize(builder = ImmutableNpmPackageMeta.Builder.class)
+@JsonSerialize
+public interface NpmPackageMeta {
 
-  public String name;
-  public List<String> keywords;
-  public JsonNode license;
-  public String description;
-  public String readme;
-  public String readmeFilename;
+  String name();
+
+  List<String> keywords();
+
+  JsonNode license();
+
+  String description();
+
+  String readme();
+
+  String readmeFilename();
+
+  // @JsonDeserialize(keyAs = ExactVersion.class)
+  Map<ExactVersion, NpmPackageVersionMeta> versions();
+
+  Map<String, String> time();
+
+  Map<String, Boolean> users();
+
+  List<String> homepage();
+
+  JsonNode maintainers();
+
+  JsonNode repository();
+
+  JsonNode bugs();
+
+  ObjectNode scripts();
 
   @JsonDeserialize(keyAs = ExactVersion.class)
-  public Map<ExactVersion, NpmPackageVersionMeta> versions = new HashMap<>();
-  public Map<String, String> time;
-  public Map<String, Boolean> users;
-  public List<String> homepage;
-  public JsonNode maintainers;
-  public JsonNode repository;
-  public JsonNode bugs;
+  String version();
+
+  String main();
 
   @JsonProperty("dist-tags")
   @JsonDeserialize(keyAs = TagIdentifier.class, contentAs = ExactVersion.class)
-  public Map<TagIdentifier, ExactVersion> distTags = new HashMap<>();
+  Map<TagIdentifier, ExactVersion> distTags = new HashMap<>();
 
-  private Map<String, JsonNode> values = new HashMap<>();
+  // private Map<String, JsonNode> values = new HashMap<>();
 
   /**
    * 
    */
 
-  @JsonAnySetter
-  public void set(String key, JsonNode value) {
-    this.values.put(key, value);
-  }
+  // @JsonAnySetter
+  // default void set(String key, JsonNode value) {
+  // this.values.put(key, value);
+  // }
 
 }

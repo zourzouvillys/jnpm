@@ -2,8 +2,6 @@ package io.zrz.jnpm.semver;
 
 import org.apache.commons.lang3.NotImplementedException;
 
-import lombok.Getter;
-
 /**
  * A unary version operator.
  *
@@ -13,15 +11,20 @@ import lombok.Getter;
 
 public class UnaryVersion implements VersionRange {
 
-  @Getter
   private final VersionOperator op;
-
-  @Getter
   private final ExactVersion version;
 
   public UnaryVersion(VersionOperator op, ExactVersion version) {
     this.op = op;
     this.version = version;
+  }
+  
+  public VersionOperator op() {
+    return this.op;
+  }
+  
+  public ExactVersion exactVersion() {
+    return this.version;
   }
 
   @Override
@@ -56,10 +59,11 @@ public class UnaryVersion implements VersionRange {
           return false;
         }
 
-        final ExactVersion test = this.version
+        final ExactVersion test =
+          this.version
             .withIncrement((this.version.rightMostNonZeroPosition(VersionPart.Major) == VersionPart.Major)
-                ? VersionPart.Major
-                : VersionPart.Minor);
+                                                                                                           ? VersionPart.Major
+                                                                                                           : VersionPart.Minor);
 
         return other.compareTo(test) < 0;
 

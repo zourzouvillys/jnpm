@@ -3,19 +3,18 @@ package io.zrz.jnpm.semver;
 import java.util.List;
 import java.util.Objects;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import com.google.common.base.Joiner;
 
-import lombok.EqualsAndHashCode;
-
 /**
- * A collection of version specifications which together are evaluated in OR or
- * AND.
+ * A collection of version specifications which together are evaluated in OR or AND.
  * 
  * @author theo
  *
  */
 
-@EqualsAndHashCode
 public class VersionCollection implements VersionRange {
 
   private final List<VersionRange> items;
@@ -61,7 +60,24 @@ public class VersionCollection implements VersionRange {
 
   @Override
   public String toString() {
-    return Joiner.on((op == BinaryOperator.And) ? " " : " || ").join(items);
+    return Joiner.on((op == BinaryOperator.And) ? " "
+                                                : " || ")
+      .join(items);
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (other instanceof VersionCollection) {
+      return new EqualsBuilder().append(items, ((VersionCollection) other).items)
+        .append(op, ((VersionCollection) other).op)
+        .build();
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder().append(items).append(op).build();
   }
 
 }

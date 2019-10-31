@@ -6,7 +6,6 @@ import java.util.concurrent.TimeUnit;
 
 import com.google.common.net.UrlEscapers;
 
-import lombok.SneakyThrows;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Request.Builder;
@@ -29,7 +28,6 @@ public class NpmRemotePackageRepository {
    * 
    */
 
-  @SneakyThrows(IOException.class)
   public Response query(String name, Optional<String> etag) {
 
     OkHttpClient client = new OkHttpClient().newBuilder().readTimeout(30, TimeUnit.SECONDS).build();
@@ -42,7 +40,13 @@ public class NpmRemotePackageRepository {
       request = request.header("If-None-Match", etag.get().toString());
     }
 
-    return client.newCall(request.build()).execute();
+    try {
+      return client.newCall(request.build()).execute();
+    }
+    catch (IOException e) {
+      // TODO Auto-generated catch block
+      throw new RuntimeException(e);
+    }
 
   }
 

@@ -17,19 +17,22 @@ import io.zrz.jnpm.NpmPackageUrlIdentifier;
 
 public class VersionParser {
 
-  private static final Pattern strict = Pattern
+  private static final Pattern strict =
+    Pattern
       .compile(
-          "^v?([0-9xX\\*]+)(?:\\.([0-9xX\\*]+)(?:\\.([0-9xX\\*]+))?)?(?:\\-([-0-9A-Za-z\\.]+))?(?:\\+([-0-9A-Za-z\\.]+))?$");
+        "^v?([0-9xX\\*]+)(?:\\.([0-9xX\\*]+)(?:\\.([0-9xX\\*]+))?)?(?:\\-([-0-9A-Za-z\\.]+))?(?:\\+([-0-9A-Za-z\\.]+))?$");
 
-  private static final Pattern p = Pattern
+  private static final Pattern p =
+    Pattern
       .compile(
-          "^v?([0-9xX\\*]+)(?:\\.([0-9xX\\*]+)(?:\\.([0-9xX\\*]+))?)?(?:\\-?([-0-9A-Za-z\\.]+))?(?:\\+([-0-9A-Za-z\\.]+))?$");
+        "^v?([0-9xX\\*]+)(?:\\.([0-9xX\\*]+)(?:\\.([0-9xX\\*]+))?)?(?:\\-?([-0-9A-Za-z\\.]+))?(?:\\+([-0-9A-Za-z\\.]+))?$");
 
-  private static final Pattern WILDCARD_PATTERN = Pattern
+  private static final Pattern WILDCARD_PATTERN =
+    Pattern
       .compile(
-          "^v?([0-9xX\\*]+)"
-              + "(?:\\.([0-9xX\\*]+)(?:\\.([0-9xX\\*]+))?)?"
-              + "(?:\\-?([-0-9A-Za-z\\.]+))?(?:\\+([-0-9A-Za-z\\.]+))?$");
+        "^v?([0-9xX\\*]+)"
+            + "(?:\\.([0-9xX\\*]+)(?:\\.([0-9xX\\*]+))?)?"
+            + "(?:\\-?([-0-9A-Za-z\\.]+))?(?:\\+([-0-9A-Za-z\\.]+))?$");
 
   /**
    * Parses a version with a wildcard in it.
@@ -47,7 +50,7 @@ public class VersionParser {
     final int minor = parseWildcardInt(r.group(2));
     final int patch = parseWildcardInt(r.group(3));
 
-    return Optional.of(new WildcardRange(major, minor, patch));
+    return Optional.of(WildcardRange.fromParts(major, minor, patch));
 
   }
 
@@ -65,8 +68,8 @@ public class VersionParser {
   }
 
   /**
-   * Parses an exact version number. wildcards are not allowed, and a major,
-   * minor, and patch MUST all be specified.
+   * Parses an exact version number. wildcards are not allowed, and a major, minor, and patch MUST
+   * all be specified.
    *
    * @param value
    * @return
@@ -79,10 +82,10 @@ public class VersionParser {
     Preconditions.checkArgument(r.matches(), value);
 
     return new ExactVersion(
-        VersionParser.parseInt(r.group(1)),
-        VersionParser.parseInt(r.group(2)),
-        VersionParser.parseInt(r.group(3)),
-        VersionQualifier.builder().pre(r.group(4)).buildTag(r.group(5)).build());
+      VersionParser.parseInt(r.group(1)),
+      VersionParser.parseInt(r.group(2)),
+      VersionParser.parseInt(r.group(3)),
+      VersionQualifier.builder().pre(r.group(4)).buildTag(r.group(5)).build());
 
   }
 
@@ -141,7 +144,8 @@ public class VersionParser {
         values.add(new LinkedList<>(collection));
         collection.clear();
 
-      } finally {
+      }
+      finally {
         s.close();
       }
 
@@ -150,10 +154,12 @@ public class VersionParser {
         return parseGroup(values.get(0));
       }
 
-      return new VersionCollection(BinaryOperator.Or,
-          values.stream().map(VersionParser::parseGroup).collect(Collectors.toList()));
+      return new VersionCollection(
+        BinaryOperator.Or,
+        values.stream().map(VersionParser::parseGroup).collect(Collectors.toList()));
 
-    } catch (final Exception ex) {
+    }
+    catch (final Exception ex) {
       throw new RuntimeException(value, ex);
     }
 
@@ -167,8 +173,8 @@ public class VersionParser {
     }
 
     return new VersionCollection(
-        BinaryOperator.And,
-        values.stream().map(val -> parseRangeOrExact(val)).collect(Collectors.toList()));
+      BinaryOperator.And,
+      values.stream().map(val -> parseRangeOrExact(val)).collect(Collectors.toList()));
 
   }
 
@@ -183,17 +189,23 @@ public class VersionParser {
 
     if (value.startsWith(">=")) {
       return new UnaryVersion(VersionOperator.GreaterOrEqual, parseVersion(value.substring(2)));
-    } else if (value.startsWith(">")) {
+    }
+    else if (value.startsWith(">")) {
       return new UnaryVersion(VersionOperator.Greater, parseVersion(value.substring(1)));
-    } else if (value.startsWith("<=")) {
+    }
+    else if (value.startsWith("<=")) {
       return new UnaryVersion(VersionOperator.LessOrEqual, parseVersion(value.substring(2)));
-    } else if (value.startsWith("<")) {
+    }
+    else if (value.startsWith("<")) {
       return new UnaryVersion(VersionOperator.Less, parseVersion(value.substring(1)));
-    } else if (value.startsWith("~")) {
+    }
+    else if (value.startsWith("~")) {
       return new UnaryVersion(VersionOperator.TildeRange, parseVersion(value.substring(1)));
-    } else if (value.startsWith("^")) {
+    }
+    else if (value.startsWith("^")) {
       return new CaretVersion(value.substring(1));
-    } else if (value.startsWith("=")) {
+    }
+    else if (value.startsWith("=")) {
       return parseVersion(value.substring(1));
     }
 

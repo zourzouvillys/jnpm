@@ -7,8 +7,6 @@ import org.apache.commons.lang3.StringUtils;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.base.CharMatcher;
 
-import lombok.EqualsAndHashCode;
-
 /**
  * A concrete semantic version number.
  *
@@ -16,7 +14,6 @@ import lombok.EqualsAndHashCode;
  *
  */
 
-@EqualsAndHashCode
 public class ExactVersion implements VersionRange, Comparable<ExactVersion>, SemanticVersion {
 
   private final int major, minor, patch;
@@ -89,14 +86,14 @@ public class ExactVersion implements VersionRange, Comparable<ExactVersion>, Sem
 
     // is there an existing tag?
 
-    if (this.qualifier.getPre() == null || !StringUtils.startsWith(this.qualifier.getPre(), pfx)) {
+    if ((this.qualifier.pre() == null) || !StringUtils.startsWith(this.qualifier.pre(), pfx)) {
       if (tag == null) {
         return "0";
       }
       return String.format("%s.%d", tag, 0);
     }
 
-    final String current = this.qualifier.getPre().substring(pfx.length());
+    final String current = this.qualifier.pre().substring(pfx.length());
 
     if (!current.isEmpty() && CharMatcher.inRange('0', '9').matchesAllOf(current)) {
       return pfx + (Integer.parseInt(current) + 1);
@@ -109,7 +106,7 @@ public class ExactVersion implements VersionRange, Comparable<ExactVersion>, Sem
   }
 
   public ExactVersion withPrerelease(String pre) {
-    if (this.qualifier.getPre() != null) {
+    if (this.qualifier.pre() != null) {
       return new ExactVersion(this.major, this.minor, this.patch, this.qualifier.withPre(this.pre(pre)));
     }
     return this.withPrerelease(VersionPart.Patch, pre);
@@ -136,11 +133,14 @@ public class ExactVersion implements VersionRange, Comparable<ExactVersion>, Sem
 
     final StringBuilder sb = new StringBuilder();
 
-    sb.append(this.major == -1 ? "X" : this.major);
+    sb.append(this.major == -1 ? "X"
+                               : this.major);
     sb.append(".");
-    sb.append(this.minor == -1 ? "X" : this.minor);
+    sb.append(this.minor == -1 ? "X"
+                               : this.minor);
     sb.append(".");
-    sb.append(this.patch == -1 ? "X" : this.patch);
+    sb.append(this.patch == -1 ? "X"
+                               : this.patch);
 
     sb.append(this.qualifier.toString());
 
@@ -226,32 +226,32 @@ public class ExactVersion implements VersionRange, Comparable<ExactVersion>, Sem
   @Override
   public int compareTo(ExactVersion other) {
 
-    if (this.major != -1 && other.major != -1) {
+    if ((this.major != -1) && (other.major != -1)) {
       if (this.major != other.major) {
         return Integer.compare(this.major, other.major);
       }
     }
 
-    if (this.minor != -1 && other.minor != -1) {
+    if ((this.minor != -1) && (other.minor != -1)) {
       if (this.minor != other.minor) {
         return Integer.compare(this.minor, other.minor);
       }
     }
 
-    if (this.patch != -1 && other.patch != -1) {
+    if ((this.patch != -1) && (other.patch != -1)) {
       if (this.patch != other.patch) {
         return Integer.compare(this.patch, other.patch);
       }
     }
 
-    if (!StringUtils.equals(this.qualifier.getPre(), other.qualifier.getPre())) {
-      if (this.qualifier.getPre() != null && other.qualifier.getPre() == null) {
+    if (!StringUtils.equals(this.qualifier.pre(), other.qualifier.pre())) {
+      if ((this.qualifier.pre() != null) && (other.qualifier.pre() == null)) {
         return -1;
       }
-      if (this.qualifier.getPre() == null && other.qualifier.getPre() != null) {
+      if ((this.qualifier.pre() == null) && (other.qualifier.pre() != null)) {
         return 1;
       }
-      return this.qualifier.getPre().compareTo(other.qualifier.getPre());
+      return this.qualifier.pre().compareTo(other.qualifier.pre());
     }
 
     return 0;

@@ -11,10 +11,10 @@ public class NpmVersionParserTest {
 
   @Test
   public void test() {
-    assertEquals(WildcardRange.fromParts(), VersionParser.parseWildcard("*"));
-    assertEquals(WildcardRange.fromParts(0), VersionParser.parseWildcard("0"));
-    assertEquals(WildcardRange.fromParts(0, 1), VersionParser.parseWildcard("0.1"));
-    assertEquals(WildcardRange.fromParts(0, 1), VersionParser.parseWildcard("0.1.x"));
+    assertEquals(WildcardRange.fromParts(), VersionParser.parseWildcard("*").get());
+    assertEquals(WildcardRange.fromParts(0), VersionParser.parseWildcard("0").get());
+    assertEquals(WildcardRange.fromParts(0, 1), VersionParser.parseWildcard("0.1").get());
+    assertEquals(WildcardRange.fromParts(0, 1), VersionParser.parseWildcard("0.1.x").get());
   }
 
 }

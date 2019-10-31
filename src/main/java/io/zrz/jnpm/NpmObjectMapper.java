@@ -1,6 +1,7 @@
 package io.zrz.jnpm;
 
 import java.io.IOException;
+import java.nio.file.Path;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -28,12 +29,30 @@ public class NpmObjectMapper {
   }
 
   public static NpmPackageVersionMeta readPackageVersionMeta(byte[] bytes)
-      throws JsonParseException, JsonMappingException, IOException {
+      throws JsonParseException,
+      JsonMappingException,
+      IOException {
     return INSTANCE.mapper.readValue(bytes, NpmPackageVersionMeta.class);
   }
 
+  public static NpmPackageVersionMeta readPackageVersionMeta(Path path)
+      throws JsonParseException,
+      JsonMappingException,
+      IOException {
+    return INSTANCE.mapper.readValue(path.toFile(), NpmPackageVersionMeta.class);
+  }
+
+  public static NpmPackageMeta readPackageMeta(Path packageJson)
+      throws JsonParseException,
+      JsonMappingException,
+      IOException {
+    return INSTANCE.mapper.readValue(packageJson.toFile(), NpmPackageMeta.class);
+  }
+
   public static NpmPackageMeta readPackageMeta(byte[] bytes)
-      throws JsonParseException, JsonMappingException, IOException {
+      throws JsonParseException,
+      JsonMappingException,
+      IOException {
     return INSTANCE.mapper.readValue(bytes, NpmPackageMeta.class);
   }
 

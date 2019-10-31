@@ -9,8 +9,13 @@ buildscript {
     }
 }
 
-apply plugin: "pride"
-apply plugin: 'java'
+
+plugins {
+  id 'java'
+  id 'eclipse'
+  id "net.ltgt.apt" version '0.19'
+  id "net.ltgt.apt-eclipse" version '0.19'
+}
 
 version = '0.1-SNAPSHOT'
 sourceCompatibility = 1.8
@@ -23,19 +28,26 @@ repositories {
 // In this section you declare the dependencies for your production and test code
 dependencies {
 
+  annotationProcessor "org.immutables:value:2.7.5"
+  
+  compileOnly "org.immutables:value-annotations:2.7.5"
+  compileOnly 'org.immutables.vavr:vavr-encodings:0.6.0'
+  compileOnly "org.immutables:builder:2.7.5"
+
+  
+  
 	// general utils
-    compile 'org.projectlombok:lombok:1.16.10'
     compile 'org.slf4j:slf4j-api:1.7.21'
-	compile 'com.google.guava:guava:19.0'
+	compile 'com.google.guava:guava:27.1-jre'
 	compile 'org.apache.commons:commons-lang3:3.4'
 
 	// network + dispatch
 	compile 'com.squareup.okhttp3:okhttp:3.4.1'
 
 	// JSON
-	compile 'com.fasterxml.jackson.core:jackson-databind:2.8.1'
-	compile 'com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.8.1'
-	compile 'com.fasterxml.jackson.datatype:jackson-datatype-guava:2.7.3'
+	compile 'com.fasterxml.jackson.core:jackson-databind:2.9.8'
+	compile 'com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.9.8'
+	compile 'com.fasterxml.jackson.datatype:jackson-datatype-guava:2.9.8'
 
 	// for testing
     testCompile 'junit:junit:4.12'

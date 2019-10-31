@@ -1,55 +1,61 @@
 package io.zrz.jnpm.semver;
 
-import lombok.Builder;
-import lombok.Value;
-import lombok.experimental.Wither;
+import javax.annotation.Nullable;
 
-@Value
-@Builder
-@Wither
-public class VersionQualifier implements VersionSpec {
+import org.immutables.value.Value;
 
-  private static final VersionQualifier EMPTY = new VersionQualifier(null, null);
+@Value.Immutable
+@Value.Style(overshadowImplementation = true)
+public abstract class VersionQualifier implements VersionSpec, WithVersionQualifier {
+
+  public static final VersionQualifier EMPTY = ImmutableVersionQualifier.of(null, null);
 
   /**
    * The prerelease tag.
    */
 
-  private final String pre;
+  @Value.Parameter
+  @Nullable
+  public abstract String pre();
 
   /**
    * The build tag.
    */
 
-  private final String buildTag;
+  @Value.Parameter
+  @Nullable
+  public abstract String buildTag();
 
   public VersionQualifier withoutPrerelease() {
     return this.withPre(null);
   }
 
-  public static VersionQualifier emptyQualifier() {
+  static VersionQualifier emptyQualifier() {
     return EMPTY;
   }
 
-  @Override
+  static ImmutableVersionQualifier.Builder builder() {
+    return ImmutableVersionQualifier.builder();
+  }
 
+  @Override
   public String toString() {
 
     final StringBuilder sb = new StringBuilder();
 
-    if (this.pre != null) {
-      sb.append('-').append(this.pre);
+    if (this.pre() != null) {
+      sb.append('-').append(this.pre());
     }
-    if (this.buildTag != null) {
-      sb.append('+').append(this.buildTag);
+    if (this.buildTag() != null) {
+      sb.append('+').append(this.buildTag());
     }
 
     return sb.toString();
 
   }
 
-  public boolean isPrerelease() {
-    return this.pre != null;
+  public final boolean isPrerelease() {
+    return this.pre() != null;
   }
 
 }
